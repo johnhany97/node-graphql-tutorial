@@ -7,15 +7,34 @@ const { GraphQLServer } = require('graphql-yoga')
 const typeDefs = `
 type Query {
   info: String!
+  feed: [Link!]!
+}
+
+type Link {
+  id: ID!
+  description: String!
+  url: String!
 }
 `
-
+// Currently, this is used to store the links at runtime.
+// We're storing in in-memory rather than in a database for now..
+let links = [{
+  id: 'link-0',
+  url: 'www.howtographql.com',
+  description: 'Fullstack tutorial for GraphQL',
+}]
 // resolvers
 // This is the actual implementation of the GraphQL Schema. It's structure
 // is notably identical to that of the type definition (inside `typeDefs: Query.info`)
 const resolvers = {
   Query: {
-    info: () => `This is the API of a Hackernews Clone`
+    info: () => `This is the API of a Hackernews Clone`,
+    feed: () => links, // A resolver for the fields for the `feed` root field. 
+  },
+  Link: { // Follows are three more resolvers for the fields on the `Link` type from the schema definition
+    id: (root) => root.id,
+    description: (root) => root.description,
+    url: (root) => root.url,
   }
 }
 
