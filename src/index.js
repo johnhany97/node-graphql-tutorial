@@ -15,6 +15,7 @@ const resolvers = {
   Query: {
     info: () => `This is the API of a Hackernews Clone`,
     feed: () => links, // A resolver for the fields for the `feed` root field. 
+    link: (root, args) => links.find(x => x.id === args.id),
   },
   Mutation: {
     post: (root, args) => {
@@ -24,6 +25,21 @@ const resolvers = {
         url: args.url,
       }
       links.push(link)
+      return link
+    },
+    updateLink: (root, args) => {
+      let index = links.findIndex(x => x.id === args.id)
+      if (index !== -1) {
+        let copy = links[index]
+        copy.url = args.url ? args.url : copy.url
+        copy.description = args.description ? args.description : copy.description
+        links[index] = copy
+        return copy
+      }
+    },
+    deleteLink: (root, args) => {
+      let link = links.find(x => x.id === args.id)
+      links = links.filter(x => x.id !== args.id)
       return link
     }
   },
