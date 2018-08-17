@@ -1,40 +1,20 @@
-const { GraphQLServer } = require('graphql-yoga')
+const {
+  GraphQLServer
+} = require('graphql-yoga')
+const {
+  Prisma
+} = require('prisma-binding')
+const Query = require('./resolvers/Query')
+const Mutation = require('./resolvers/Mutation')
+const AuthPayload = require('./resolvers/AuthPayload')
 
 // resolvers
 // This is the actual implementation of the GraphQL Schema. It's structure
 // is notably identical to that of the type definition (inside `typeDefs: Query.info`)
 const resolvers = {
-  Query: {
-    info: () => `This is the API of a Hackernews Clone`,
-    feed: () => links, // A resolver for the fields for the `feed` root field. 
-    link: (root, args) => links.find(x => x.id === args.id),
-  },
-  Mutation: {
-    post: (root, args) => {
-      const link = {
-        id: `link-${idCount++}`,
-        description: args.description,
-        url: args.url,
-      }
-      links.push(link)
-      return link
-    },
-    updateLink: (root, args) => {
-      let index = links.findIndex(x => x.id === args.id)
-      if (index !== -1) {
-        let copy = links[index]
-        copy.url = args.url ? args.url : copy.url
-        copy.description = args.description ? args.description : copy.description
-        links[index] = copy
-        return copy
-      }
-    },
-    deleteLink: (root, args) => {
-      let link = links.find(x => x.id === args.id)
-      links = links.filter(x => x.id !== args.id)
-      return link
-    }
-  },
+  Query,
+  Mutation,
+  AuthPayload,
 }
 
 // Both the typeDefs and the resolvers are bundled together
@@ -44,5 +24,14 @@ const resolvers = {
 const server = new GraphQLServer({
   typeDefs: './src/schema.graphql',
   resolvers,
+  context: req => ({
+    ...req,
+    db: new Prisma({
+      typeDefs: 'src/generated/prisma.graphql',
+      endpoint: 'https://eu1.prisma.sh/john-h-ayad-3bdf05/database/dev',
+      secret: 'mysecret123',
+      debug: true,
+    })
+  })
 })
 server.start(() => console.log(`Server is running on http://localhost:4000`))
