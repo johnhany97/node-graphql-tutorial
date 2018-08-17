@@ -1,13 +1,5 @@
 const { GraphQLServer } = require('graphql-yoga')
 
-// Currently, this is used to store the links at runtime.
-// We're storing in in-memory rather than in a database for now..
-let links = [{
-  id: 'link-0',
-  url: 'www.howtographql.com',
-  description: 'Fullstack tutorial for GraphQL',
-}]
-let idCount = links.length
 // resolvers
 // This is the actual implementation of the GraphQL Schema. It's structure
 // is notably identical to that of the type definition (inside `typeDefs: Query.info`)
